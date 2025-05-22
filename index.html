@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Quiz Python para Análise de dados - Completo</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #121212;
+    color: #eee;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .quiz-container {
+    background: #1f1f1f;
+    padding: 20px 25px;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90vw;
+    box-shadow: 0 0 15px #af4ca8;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .question {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+  }
+
+  .options {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .options li {
+    margin-bottom: 12px;
+  }
+
+  button.option-btn {
+    width: 100%;
+    background: #333;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #eee;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  button.option-btn:hover {
+    background: #4caf50;
+  }
+
+  button.option-btn:active {
+    background: #388e3c;
+  }
+
+  .next-btn {
+    margin-top: 20px;
+    width: 100%;
+    background: #4caf50;
+    border: none;
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+  }
+
+  .next-btn:disabled {
+    background: #888;
+    cursor: not-allowed;
+  }
+
+  .score {
+    font-size: 1.3rem;
+    text-align: center;
+    margin-top: 25px;
+  }
+
+  @media (max-width: 480px) {
+    .quiz-container {
+      padding: 15px 20px;
+      max-width: 95vw;
+    }
+
+    .question {
+      font-size: 1.1rem;
+    }
+
+    button.option-btn {
+      padding: 16px;
+      font-size: 1.1rem;
+    }
+
+    .next-btn {
+      padding: 18px;
+      font-size: 1.2rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz">
+  <h1>Quiz Python para Análise de Dados</h1>
+  <div class="question" id="question">Carregando...</div>
+  <ul class="options" id="options"></ul>
+  <button class="next-btn" id="nextBtn" disabled>Próxima</button>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+  const quizData = [
+    {
+      question: "1. Qual função remove linhas duplicadas de um DataFrame?",
+      options: ["drop_duplicates()", "remove_rows()", "clean_data()", "delete_duplicates()"],
+      answer: "drop_duplicates()"
+    },
+    {
+      question: "2. Qual biblioteca é usada para gráficos em Python?",
+      options: ["Matplotlib", "Pandas", "NumPy", "Seaborn"],
+      answer: "Matplotlib"
+    },
+    {
+      question: "3. Como ler um arquivo CSV no Pandas?",
+      options: ["pd.load_csv()", "pd.read_text()", "pd.read_csv()", "pd.open_csv()"],
+      answer: "pd.read_csv()"
+    },
+    {
+      question: "4. Como calcular a soma de uma coluna 'vendas' em Pandas?",
+      options: ["df['vendas'].sum()", "sum(df['vendas'])", "df.sum('vendas')", "total(df['vendas'])"],
+      answer: "df['vendas'].sum()"
+    },
+    {
+      question: "5. Qual comando cria um gráfico de barras no Matplotlib?",
+      options: ["plt.bar()", "plt.plot()", "plt.hist()", "plt.scatter()"],
+      answer: "plt.bar()"
+    },
+    {
+      question: "6. Qual função do Pandas exclui colunas de um DataFrame?",
+      options: ["drop()", "remove_col()", "delete_column()", "exclude()"],
+      answer: "drop()"
+    },
+    {
+      question: "7. Como salvar um DataFrame Pandas ajustado em CSV?",
+      options: ["df.save_csv()", "df.to_csv()", "pd.save()", "pd.to_csv()"],
+      answer: "df.to_csv()"
+    },
+    {
+      question: "8. Qual a função para mostrar as primeiras linhas de um DataFrame?",
+      options: ["df.top()", "df.head()", "df.first()", "df.show()"],
+      answer: "df.head()"
+    },
+    {
+      question: "9. Como resetar o índice de um DataFrame?",
+      options: ["df.reset_index()", "df.clear_index()", "df.new_index()", "df.remove_index()"],
+      answer: "df.reset_index()"
+    },
+    {
+      question: "10. Qual comando cria um gráfico de pizza (pie chart) no Matplotlib?",
+      options: ["plt.pie()", "plt.pizza()", "plt.chart()", "plt.plot_pie()"],
+      answer: "plt.pie()"
+    }
+  ];
+
+  let currentQuestion = 0;
+  let score = 0;
+
+  const questionEl = document.getElementById('question');
+  const optionsEl = document.getElementById('options');
+  const nextBtn = document.getElementById('nextBtn');
+  const scoreEl = document.getElementById('score');
+
+  function loadQuestion() {
+    nextBtn.disabled = true;
+    scoreEl.textContent = '';
+    const q = quizData[currentQuestion];
+    questionEl.textContent = q.question;
+    optionsEl.innerHTML = '';
+
+    q.options.forEach(option => {
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = option;
+      btn.addEventListener('click', () => selectOption(btn, q.answer));
+      li.appendChild(btn);
+      optionsEl.appendChild(li);
+    });
+  }
+
+  function selectOption(btn, correctAnswer) {
+    if (btn.textContent === correctAnswer) {
+      score++;
+      btn.style.backgroundColor = '#4caf50'; // verde se acertar
+    } else {
+      btn.style.backgroundColor = '#f44336'; // vermelho se errar
+    }
+    // Bloquear todos os botões após uma escolha
+    const allBtns = document.querySelectorAll('.option-btn');
+    allBtns.forEach(b => b.disabled = true);
+    nextBtn.disabled = false;
+  }
+
+  nextBtn.addEventListener('click', () => {
+    currentQuestion++;
+    if (currentQuestion < quizData.length) {
+      loadQuestion();
+    } else {
+      showScore();
+    }
+  });
+
+  function showScore() {
+    questionEl.textContent = 'Fim do Quiz! Você acertou ' + score + ' de ' + quizData.length + ' perguntas.';
+    optionsEl.innerHTML = '';
+    nextBtn.style.display = 'none';
+    scoreEl.textContent = 'Parabéns! Continue praticando para virar um craque.';
+  }
+
+  loadQuestion();
+</script>
+
+</body>
+</html>
