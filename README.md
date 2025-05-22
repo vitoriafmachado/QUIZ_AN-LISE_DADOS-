@@ -65,7 +65,4 @@ Este projeto está sob a licença MIT — sinta-se livre para usar, modificar e 
 
 ---
 
-Se quiser, posso ajudar a criar uma página web bonitona para apresentar esse projeto no GitHub Pages também. Quer?  
-
-Vai fundo que você vai longe! 🚀
 
